@@ -5,18 +5,23 @@
 
 ## 🚀 Quick Start
 
-### 1. Install Dependencies
+### 🪟 Windows
+
+**1. Install Dependencies**
 ```bash
 ./install-audiobook.bat
 ```
 
-### 2. Launch the Application
+**2. Launch the Application**
 ```bash
 ./launch_audiobook.bat
 ```
 
-### 3. CUDA Issue Fix (If Needed)
-If you encounter CUDA assertion errors during generation, install the patched version:
+The web interface will open automatically in your browser at `http://localhost:7860`
+
+**3. CUDA Issue Fix (If Needed)**
+
+If you encounter CUDA assertion errors during generation:
 ```bash
 # Activate your virtual environment first
 venv\Scripts\activate.bat
@@ -25,7 +30,47 @@ venv\Scripts\activate.bat
 pip install --force-reinstall --no-cache-dir "chatterbox-tts @ git+https://github.com/fakerybakery/better-chatterbox@fix-cuda-issue"
 ```
 
-The web interface will open automatically in your browser at `http://localhost:7860`
+---
+
+### 🍎 macOS (Apple Silicon & Intel)
+
+Chatterbox runs on Mac with Metal GPU acceleration (MPS) on Apple Silicon (M1/M2/M3/M4) and CPU on Intel Macs.
+
+**1. Create and activate a conda environment**
+```bash
+conda create -n chatterbox python=3.10
+conda activate chatterbox
+```
+
+**2. Install PyTorch for Mac**
+```bash
+conda install pytorch::pytorch torchvision torchaudio -c pytorch
+```
+
+**3. Install dependencies**
+```bash
+pip install "setuptools<70"
+pip install -r requirements-mac.txt
+```
+
+**4. Install the package**
+```bash
+pip install -e . --no-deps
+```
+
+**5. Download the spaCy language model**
+```bash
+python -m spacy download en_core_web_sm
+```
+
+**6. Launch the application**
+```bash
+python gradio_tts_app_audiobook.py
+```
+
+The web interface will open at `http://localhost:7860`
+
+> **Note:** `setuptools<70` is required because librosa 0.10.0 depends on `pkg_resources`, which is missing from newer setuptools versions shipped with conda.
 
 ---
 
@@ -301,17 +346,30 @@ Enhanced the core text-to-speech engine for better reliability:
 
 ## 🛠️ Technical Requirements
 
-- **Python 3.8+**
-- **CUDA GPU** (recommended for faster processing)
+- **Python 3.10**
 - **8GB+ RAM** (16GB recommended for large projects)
 - **Modern web browser** for the interface
 
-### 🔧 **CUDA Support**
+| Platform | GPU Acceleration | Install Guide |
+|---|---|---|
+| Windows | NVIDIA CUDA (recommended) | `install-audiobook.bat` |
+| macOS Apple Silicon (M1–M4) | Metal MPS | `requirements-mac.txt` |
+| macOS Intel | CPU only | `requirements-mac.txt` |
+| Linux | NVIDIA CUDA | `requirements.txt` (remove `+cu121` for CPU) |
+
+### 🔧 **GPU Support**
+
+**Windows / Linux (NVIDIA CUDA)**
+- CUDA 12.1 is used by default (`torch==2.4.1+cu121`)
 - CUDA compatibility issues have been resolved with updated dependencies
-- GPU acceleration is now stable for extended generation sessions
-- Fallback to CPU processing available if CUDA issues occur
+- GPU acceleration is stable for extended generation sessions
+- CPU fallback is available — remove `+cu121` suffixes from `requirements.txt`
 - **If you encounter CUDA assertion errors**: Use the patched version from the installation instructions above
-- The fix addresses PyTorch indexing issues that could cause crashes during audio generation
+
+**macOS (Metal / MPS)**
+- Apple Silicon (M1/M2/M3/M4) uses Metal Performance Shaders for GPU acceleration
+- Intel Macs run on CPU — no additional configuration needed
+- Use `requirements-mac.txt` — it excludes CUDA packages that are not available on Mac
 
 ---
 
@@ -365,4 +423,9 @@ This project is licensed under the terms specified in `LICENSE`.
 
 ---
 
-**🎉 Ready to create amazing audiobooks with professional volume levels and enhanced audio quality? Run `./launch_audiobook.bat` and start generating!** 
+**🎉 Ready to create amazing audiobooks with professional volume levels and enhanced audio quality?**
+
+- **Windows**: Run `./launch_audiobook.bat`
+- **macOS**: Run `python gradio_tts_app_audiobook.py` (with the `chatterbox` conda env active)
+
+Start generating!

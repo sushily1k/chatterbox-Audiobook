@@ -5983,8 +5983,7 @@ with gr.Blocks(css=css, title="Chatterbox TTS - Audiobook Edition") as demo:
                             chunk_audio = gr.Audio(
                                 label=f"Chunk {i+1} Audio",
                                 interactive=True,  # Enable trimming
-                                show_download_button=True,
-                                show_share_button=False,
+                                buttons=["download"],
                                 waveform_options=gr.WaveformOptions(
                                     waveform_color="#01C6FF",
                                     waveform_progress_color="#0066B4", 
@@ -6025,8 +6024,7 @@ with gr.Blocks(css=css, title="Chatterbox TTS - Audiobook Edition") as demo:
                                 label=f"Regenerated Chunk {i+1}",
                                 visible=False,
                                 interactive=True,  # Enable trimming
-                                show_download_button=True,
-                                show_share_button=False,
+                                buttons=["download"],
                                 waveform_options=gr.WaveformOptions(
                                     waveform_color="#FF6B6B",
                                     waveform_progress_color="#FF4444",

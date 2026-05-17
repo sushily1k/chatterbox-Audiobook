@@ -2,10 +2,6 @@ import os
 import random
 import tempfile
 
-# Allow MPS to fall back to CPU only for ops it can't handle (e.g. channels > 65536).
-# Everything else still runs on Metal GPU — this is NOT a full CPU fallback.
-os.environ.setdefault("PYTORCH_ENABLE_MPS_FALLBACK", "1")
-
 import numpy as np
 import torch
 import gradio as gr
@@ -518,13 +514,18 @@ with gr.Blocks(title="Chatterbox Audiobook", theme=gr.themes.Soft()) as demo:
     stop_btn.click(fn=_hide_stop, inputs=[], outputs=[stop_btn])
 
     # Load model on app start
-    demo.load(
-        fn=lambda: (
-            print(f"[Chatterbox] Loading model on {DEVICE}…") or
-            ChatterboxTTS.from_pretrained(device=DEVICE)
-        ),
-        outputs=model_state,
-    )
+    def _load_model():
+        print(f"[Chatterbox] Loading model on {DEVICE}…")
+        model = ChatterboxTTS.from_pretrained(device=DEVICE)
+        if DEVICE == "mps":
+            # S3Tokenizer has layers with >65536 channels that MPS cannot run.
+            # It is only used in prepare_conditionals (never during generation),
+            # so keeping it on CPU is free — generation stays fully on MPS.
+            model.s3gen.tokenizer.to("cpu")
+            print("[Chatterbox] s3tokenizer pinned to CPU (MPS channel limit workaround)")
+        return model
+
+    demo.load(fn=_load_model, outputs=model_state)
 
 # ---------------------------------------------------------------------------
 # Entry point

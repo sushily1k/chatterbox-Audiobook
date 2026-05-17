@@ -2,6 +2,10 @@ import os
 import random
 import tempfile
 
+# Allow MPS to fall back to CPU only for ops it can't handle (e.g. channels > 65536).
+# Everything else still runs on Metal GPU — this is NOT a full CPU fallback.
+os.environ.setdefault("PYTORCH_ENABLE_MPS_FALLBACK", "1")
+
 import numpy as np
 import torch
 import gradio as gr

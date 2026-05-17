@@ -23,5 +23,7 @@ if ! conda env list | grep -q "^${ENV_NAME} "; then
 fi
 
 echo "Launching Chatterbox Audiobook..."
-conda run -n "${ENV_NAME}" --no-capture-output \
+# PYTORCH_ENABLE_MPS_FALLBACK lets MPS use CPU only for ops it can't handle
+# (e.g. conv layers with >65536 channels). Everything else stays on Metal GPU.
+PYTORCH_ENABLE_MPS_FALLBACK=1 conda run -n "${ENV_NAME}" --no-capture-output \
     python "${PROJECT_DIR}/gradio_audiobook_app.py"

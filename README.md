@@ -65,12 +65,25 @@ python -m spacy download en_core_web_sm
 
 **6. Launch the application**
 ```bash
-python gradio_tts_app_audiobook.py
+python gradio_audiobook_app.py
 ```
 
 The web interface will open at `http://localhost:7860`
 
 > **Note:** `setuptools<70` is required because librosa 0.10.0 depends on `pkg_resources`, which is missing from newer setuptools versions shipped with conda.
+
+---
+
+## 🆕 New in v2
+
+Built on the original [Chatterbox TTS](https://github.com/resemble-ai/chatterbox) by Resemble AI.
+
+- **Clean single-page UI** — replaces the previous complex multi-tab interface; everything you need on one screen
+- **Single Voice** — upload or record your own voice sample, then generate a script of any length
+- **Multi-Voice** — tag characters as `[Name]: dialogue`, assign a voice sample to each character, and generate a full cast audiobook
+- **Progressive output** — audio updates chunk by chunk as it generates, so you hear results immediately without waiting for the full script to finish
+- **Mac-optimised** — Metal GPU (MPS) acceleration on Apple Silicon (M1/M2/M3/M4); automatic CPU fallback on Intel Macs
+- **Microphone recording built-in** — record your voice directly in the browser for instant voice cloning, no external tools needed
 
 ---
 
@@ -426,6 +439,6 @@ This project is licensed under the terms specified in `LICENSE`.
 **🎉 Ready to create amazing audiobooks with professional volume levels and enhanced audio quality?**
 
 - **Windows**: Run `./launch_audiobook.bat`
-- **macOS**: Run `python gradio_tts_app_audiobook.py` (with the `chatterbox` conda env active)
+- **macOS**: Run `python gradio_audiobook_app.py` (with the `chatterbox` conda env active)
 
 Start generating!

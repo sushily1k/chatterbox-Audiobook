@@ -1,4 +1,5 @@
 # Chatterbox TTS Audiobook Edition - Mac Requirements
+# Main app: gradio_audiobook_app.py  (replaces gradio_tts_app_audiobook.py)
 # Use this file instead of requirements.txt on macOS
 # PyTorch is intentionally excluded here — install it first via conda:
 #   conda install pytorch::pytorch torchvision torchaudio -c pytorch
@@ -15,8 +16,11 @@ omegaconf==2.3.0
 conformer==0.3.2
 spacy>=3.4.0
 
+# Audio I/O (required for save_audio / torchaudio.save)
+torchaudio
+
 # Compatibility
 pydantic==2.10.6
 
-# Web interface
-gradio
+# Web interface (Gradio 6+ required)
+gradio>=6.0

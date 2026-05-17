@@ -90,12 +90,19 @@ def generate_single(
     sr = model.sr
     audio_chunks = []
 
+    yield f"Preparing voice… (0/{total} chunks)", None, gr.update(visible=False)
+    try:
+        conds = model.prepare_conditionals(voice_path, exaggeration=exaggeration)
+    except Exception as exc:
+        yield f"**Error** preparing voice: {exc}", None, gr.update(visible=False)
+        return
+
     for i, chunk in enumerate(chunks, 1):
         yield f"Generating chunk {i}/{total}…", None, gr.update(visible=False)
         try:
             wav = model.generate(
                 chunk,
-                audio_prompt_path=voice_path,
+                conds,
                 exaggeration=exaggeration,
                 cfg_weight=cfg_weight,
                 temperature=temperature,
@@ -184,10 +191,31 @@ def generate_multivoice(
     sr = model.sr
     audio_chunks = []
     prev_char = None
+    conds_cache: dict[str, object] = {}  # voice_path → Conditionals
 
     for seg_idx, (character, text) in enumerate(segments, 1):
         char_label = character or "Narrator"
         voice_path = voice_map.get(char_label, fallback_voice)
+
+        # Encode reference audio once per unique voice path
+        if voice_path not in conds_cache:
+            yield (
+                f"Preparing voice for {char_label}…",
+                None,
+                gr.update(visible=False),
+            )
+            try:
+                conds_cache[voice_path] = model.prepare_conditionals(
+                    voice_path, exaggeration=exaggeration
+                )
+            except Exception as exc:
+                yield (
+                    f"**Error** preparing voice for {char_label}: {exc}",
+                    None,
+                    gr.update(visible=False),
+                )
+                return
+        conds = conds_cache[voice_path]
 
         text_chunks = split_into_chunks(text.strip(), max_chars=MAX_CHUNK_CHARS)
         n_chunks = len(text_chunks)
@@ -201,7 +229,7 @@ def generate_multivoice(
             try:
                 wav = model.generate(
                     chunk,
-                    audio_prompt_path=voice_path,
+                    conds,
                     exaggeration=exaggeration,
                     cfg_weight=cfg_weight,
                     temperature=temperature,
